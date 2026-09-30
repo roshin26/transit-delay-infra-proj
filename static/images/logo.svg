@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" fill="none">
+  <!-- Outer circle dial -->
+  <circle cx="20" cy="20" r="18" stroke="#F3F2EE" stroke-width="2.5" />
+  <!-- Delay threshold track (warning arc from 12 to 3 o'clock) -->
+  <path d="M 20 2 A 18 18 0 0 1 38 20" stroke="#B4470C" stroke-width="3" stroke-linecap="round" />
+  <!-- Accent tracking arc (from 9 to 12 o'clock) -->
+  <path d="M 2 20 A 18 18 0 0 1 20 2" stroke="#1E4FD8" stroke-width="3" stroke-linecap="round" />
+  <!-- Center hub -->
+  <circle cx="20" cy="20" r="3" fill="#F3F2EE" />
+  <!-- Clock hands: Hour hand -->
+  <line x1="20" y1="20" x2="20" y2="10" stroke="#F3F2EE" stroke-width="2.5" stroke-linecap="round" />
+  <!-- Clock hands: Delay minute hand pointing into delay quadrant -->
+  <line x1="20" y1="20" x2="29" y2="15" stroke="#B4470C" stroke-width="2" stroke-linecap="round" />
+  <!-- Pulse indicator dot -->
+  <circle cx="29" cy="15" r="1.75" fill="#B4470C" />
+</svg>

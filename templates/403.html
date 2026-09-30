@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}403 Forbidden | Dublin Transit Delay Tracker{% endblock %}
+
+{% block content %}
+<div class="container-xl">
+  <div class="error-page-container">
+    <div class="tracker-card text-center p-4 p-md-5" style="max-width: 580px; width: 100%;">
+      <!-- Status Code -->
+      <div class="error-code-badge text-warning">403</div>
+      
+      <!-- Headline -->
+      <h1 class="error-headline">Access Restricted</h1>
+      
+      <!-- Explanation -->
+      <p class="error-message mx-auto">
+        You do not have permission to access this internal transit diagnostics endpoint or telemetry route.
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-center gap-2 flex-wrap">
+        <a href="#" class="btn-tracker-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span>Return to Dashboard</span>
+        </a>
+        <a href="#" class="btn-tracker-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>System Status</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}System Status &amp; Telemetry | Dublin Transit Delay Tracker{% endblock %}
+
+{% block content %}
+<div class="container-xl py-4">
+  <!-- Page Header -->
+  <div class="mb-4">
+    <h1 class="h2 mb-1">System Status &amp; Ingestion Telemetry</h1>
+    <p class="text-secondary mb-0">Live reliability, GTFS-Realtime ingest freshness, and API service level objectives.</p>
+  </div>
+
+  <!-- Overall Status Banner -->
+  <!-- DATA: overall_system_status (e.g. operational, degraded, outage) -->
+  <div class="status-hero-banner all-normal mb-4" role="region" aria-label="Current system operating condition">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="feed-pulse-dot" style="width: 8px; height: 8px;" aria-hidden="true"></span>
+        <h2 class="status-hero-title h4 mb-0">All Systems Operational</h2>
+      </div>
+      <p class="status-hero-desc">GTFS-Realtime streaming ingest from the National Transport Authority is synced within nominal tolerances.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <!-- DATA: last_evaluation_time -->
+      <span class="feed-status-pill text-dark border-secondary">
+        Updated 38s ago
+      </span>
+    </div>
+  </div>
+
+  <!-- Telemetry Metrics Cards Grid -->
+  <div class="row g-3 mb-4">
+    <!-- Card 1: Data Freshness SLO (Value vs Target with Progress Bar) -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="tracker-card h-100">
+        <div class="card-metric-label">
+          <span>Data freshness SLO</span>
+          <span class="text-muted small">Target 99.0%</span>
+        </div>
+        <!-- DATA: freshness_slo_value -->
+        <div class="card-metric-value text-accent">99.8%</div>
+        
+        <!-- Progress Bar -->
+        <div class="slo-progress-track" aria-hidden="true">
+          <!-- DATA: freshness_slo_bar_width -->
+          <div class="slo-progress-fill" style="width: 99.8%;"></div>
+        </div>
+        
+        <p class="card-subtext">
+          Target threshold: <span class="mono-num fw-semibold">&lt; 60s</span> update latency across 30 days.
+        </p>
+      </div>
+    </div>
+
+    <!-- Card 2: API p95 Latency -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="tracker-card h-100">
+        <div class="card-metric-label">
+          <span>API p95 latency</span>
+          <span class="text-muted small">Trailing 1h</span>
+        </div>
+        <!-- DATA: api_p95_latency -->
+        <div class="card-metric-value">84ms</div>
+        <p class="card-subtext">
+          p50: <span class="mono-num fw-semibold">28ms</span> · p99: <span class="mono-num fw-semibold">142ms</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Card 3: Ingestion Error Rate -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="tracker-card h-100">
+        <div class="card-metric-label">
+          <span>Error rate</span>
+          <span class="text-muted small">Past 24 hours</span>
+        </div>
+        <!-- DATA: ingestion_error_rate -->
+        <div class="card-metric-value">0.02%</div>
+        <p class="card-subtext">
+          <span class="delta-tag accent">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+            </svg>
+            -0.01%
+          </span>
+          vs weekly baseline (4 dropped protobuf frames)
+        </p>
+      </div>
+    </div>
+
+    <!-- Card 4: Worker Queue Depth -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="tracker-card h-100">
+        <div class="card-metric-label">
+          <span>Worker queue depth</span>
+          <span class="text-muted small">Kubernetes pods</span>
+        </div>
+        <!-- DATA: queue_depth -->
+        <div class="card-metric-value">0 tasks</div>
+        <p class="card-subtext">
+          4 consumer pods active · 0 backlog items
+        </p>
+      </div>
+    </div>
+
+    <!-- Card 5: Last Successful Feed Fetch -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="tracker-card h-100">
+        <div class="card-metric-label">
+          <span>Last feed fetch</span>
+          <span class="text-muted small">NTA GTFS-RT</span>
+        </div>
+        <!-- DATA: last_feed_fetch_time & size -->
+        <div class="card-metric-value">38s ago</div>
+        <p class="card-subtext">
+          Payload size: <span class="mono-num fw-semibold">2.41 MB</span> · 842 entities ingested
+        </p>
+      </div>
+    </div>
+
+    <!-- Card 6: Pipeline Uptime -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="tracker-card h-100">
+        <div class="card-metric-label">
+          <span>30-Day availability</span>
+          <span class="text-muted small">Public endpoints</span>
+        </div>
+        <!-- DATA: uptime_30d -->
+        <div class="card-metric-value">99.98%</div>
+        <p class="card-subtext">
+          Zero unannounced downtime incidents this month
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Incidents Section (Clean Public Status Page Style) -->
+  <div class="tracker-card">
+    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+      <div>
+        <h2 class="h5 mb-0">Recent Incidents &amp; Maintenance</h2>
+        <p class="text-secondary small mb-0">Public log of upstream feed interruptions and cluster scaling operations.</p>
+      </div>
+      <span class="text-secondary small">Past 30 days</span>
+    </div>
+
+    <div class="incidents-container">
+      <!-- DATA: list of recent incidents -->
+
+      <!-- Incident 1: Resolved -->
+      <article class="incident-item">
+        <div class="incident-date">28 September 2026 · 14:15 – 14:28 UTC</div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="status-pill-badge normal" style="padding: 1px 7px; font-size: 0.7rem;">Resolved</span>
+          <h3 class="incident-title h6 mb-0">Upstream GTFS-RT feed latency spike</h3>
+        </div>
+        <p class="incident-body">
+          The upstream NTA GTFS-RT vehicle position feed experienced delayed polling responses from upstream cellular telemetry providers. Freshness dropped to 94.2% for 13 minutes before auto-recovering. No historical delay records were lost.
+        </p>
+      </article>
+
+      <!-- Incident 2: Scheduled Maintenance Completed -->
+      <article class="incident-item">
+        <div class="incident-date">21 September 2026 · 02:00 – 02:18 UTC</div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="status-pill-badge normal" style="padding: 1px 7px; font-size: 0.7rem;">Completed</span>
+          <h3 class="incident-title h6 mb-0">Scheduled database index maintenance &amp; Redis warm restart</h3>
+        </div>
+        <p class="incident-body">
+          Planned zero-downtime rolling restart of worker processing containers on Azure Kubernetes Service. All background queuing completed with 0 dropped vehicle position messages.
+        </p>
+      </article>
+
+      <!-- Incident 3: Informational Notice -->
+      <article class="incident-item">
+        <div class="incident-date">14 September 2026 · 08:30 – 09:10 UTC</div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="status-pill-badge normal" style="padding: 1px 7px; font-size: 0.7rem;">Resolved</span>
+          <h3 class="incident-title h6 mb-0">Luas Green Line sensor synchronization delay</h3>
+        </div>
+        <p class="incident-body">
+          Trackside Automatic Vehicle Location (AVL) beacons between Charlemont and Beechwood reported intermittent timestamp skew. Filter algorithms isolated the affected segment until the transponder feed resynchronized.
+        </p>
+      </article>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,893 @@
+/* ==========================================================================
+   Dublin Transit Delay Tracker - Base Stylesheet
+   Data-first, calm, precision transit tracking design system
+   ========================================================================== */
+
+:root {
+  /* Color Palette */
+  --bg-canvas: #F3F2EE;
+  --surface-card: #FFFFFF;
+  --border-card: #E2E0D8;
+  --border-card-hover: #D0CECA;
+  --radius-card: 14px;
+
+  /* Typography Colors */
+  --text-primary: #17191E;
+  --text-secondary: #4E525B;
+  --text-muted: #727782;
+
+  /* Dark Theme Surfaces (Header & Dark Highlights) */
+  --surface-dark: #17191E;
+  --border-dark: #2A2E36;
+  --text-on-dark: #F3F2EE;
+  --text-on-dark-muted: #9BA1AD;
+
+  /* Status & Semantic Accents */
+  --accent: #1E4FD8;             /* On-time / Improving / Nominal */
+  --accent-hover: #153CB5;
+  --accent-subtle: #E8EEFB;
+  --accent-border: #BCD0F7;
+
+  --warning: #B4470C;            /* Delays / Worsening / Incident */
+  --warning-hover: #933808;
+  --warning-subtle: #FAEDE6;
+  --warning-border: #F3CBB5;
+
+  --neutral-steady: #5B6271;
+  --neutral-subtle: #EDEDE8;
+
+  /* Typography Scales */
+  --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Baseline transitions */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   Document & Reset Overrides
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6,
+.font-heading {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-top: 0;
+  text-wrap: balance;
+}
+
+.mono-num,
+.tabular-nums,
+[data-mono] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Links */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   Accessibility: Focus States & Skip Link
+   -------------------------------------------------------------------------- */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--text-primary);
+  color: var(--text-on-dark);
+  padding: 8px 16px;
+  z-index: 9999;
+  border-radius: 0 0 6px 0;
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Site Header (Dark Bar)
+   -------------------------------------------------------------------------- */
+.app-header {
+  background-color: var(--surface-dark);
+  color: var(--text-on-dark);
+  border-bottom: 1px solid var(--border-dark);
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.app-header .navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-on-dark);
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.app-header .brand-logo {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.app-header .nav-link {
+  color: var(--text-on-dark-muted);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.app-header .nav-link:hover {
+  color: var(--text-on-dark);
+  background-color: rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+}
+
+.app-header .nav-link.active {
+  color: var(--text-on-dark);
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Feed status pill in header */
+.feed-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-on-dark);
+  font-family: var(--font-mono);
+  font-size: 0.775rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.feed-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #22C55E;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+  display: inline-block;
+  animation: pulse 2.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.navbar-toggler-dark {
+  border: 1px solid var(--border-dark);
+  background: transparent;
+  color: var(--text-on-dark);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.navbar-toggler-dark:focus {
+  outline: 2px solid var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   Cards System
+   -------------------------------------------------------------------------- */
+.tracker-card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 1.35rem 1.5rem;
+  position: relative;
+  transition: border-color var(--transition-fast);
+}
+
+.tracker-card.dark-highlight {
+  background-color: var(--surface-dark);
+  border-color: var(--border-dark);
+  color: var(--text-on-dark);
+}
+
+.tracker-card.dark-highlight .card-metric-label {
+  color: var(--text-on-dark-muted);
+}
+
+.tracker-card.dark-highlight .card-metric-value {
+  color: var(--text-on-dark);
+}
+
+.tracker-card.dark-highlight .card-subtext {
+  color: var(--text-on-dark-muted);
+}
+
+.card-metric-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-metric-value {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.03em;
+}
+
+.card-subtext {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 0;
+}
+
+/* Delta indicators */
+.delta-tag {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.delta-tag.warning {
+  color: var(--warning);
+}
+
+.delta-tag.accent {
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   Filter Controls (Segmented Control & Select)
+   -------------------------------------------------------------------------- */
+.filter-bar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.segmented-control {
+  display: inline-flex;
+  background-color: #E7E5DD;
+  padding: 3px;
+  border-radius: 9px;
+  border: 1px solid var(--border-card);
+}
+
+.segmented-control .btn-segment {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.35rem 0.95rem;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.segmented-control .btn-segment:hover {
+  color: var(--text-primary);
+}
+
+.segmented-control .btn-segment.active {
+  background-color: var(--surface-card);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.filter-select {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-card);
+  border-radius: 8px;
+  padding: 0.4rem 2rem 0.4rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234E525B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: 2px solid var(--accent);
+  border-color: var(--accent);
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+}
+
+.search-icon-inside {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-secondary);
+}
+
+.search-input-control {
+  width: 100%;
+  padding: 0.5rem 0.85rem 0.5rem 2.4rem;
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-card);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.search-input-control:focus {
+  outline: 2px solid var(--accent);
+  border-color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   Tables & Data Rows
+   -------------------------------------------------------------------------- */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tracker-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+  font-size: 0.875rem;
+}
+
+.tracker-table th {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--border-card);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tracker-table td {
+  padding: 0.8rem 0.9rem;
+  border-bottom: 1px solid #ECEAE3;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.tracker-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tracker-table tbody tr:hover td {
+  background-color: #FAF9F5;
+}
+
+/* Route Badge (Bus / Luas pill-less clean label) */
+.route-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+}
+
+.route-badge .badge-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.mode-tag {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Delay Bar Component (Horizontal bar + value) */
+.delay-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 140px;
+}
+
+.delay-bar-track {
+  flex-grow: 1;
+  height: 6px;
+  background-color: #E7E5DD;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.delay-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background-color: var(--accent);
+}
+
+.delay-bar-fill.warning {
+  background-color: var(--warning);
+}
+
+.delay-bar-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  min-width: 50px;
+  text-align: right;
+}
+
+.delay-bar-value.warning {
+  color: var(--warning);
+}
+
+.delay-bar-value.accent {
+  color: var(--accent);
+}
+
+/* Trend Badges (Never relying on red/green alone) */
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.trend-indicator.worsening {
+  color: var(--warning);
+}
+
+.trend-indicator.improving {
+  color: var(--accent);
+}
+
+.trend-indicator.steady {
+  color: var(--neutral-steady);
+}
+
+/* --------------------------------------------------------------------------
+   Hour-by-Hour Bar Chart (Plain HTML/CSS flex divs, zero library)
+   -------------------------------------------------------------------------- */
+.chart-container {
+  padding-top: 0.5rem;
+}
+
+.bar-chart-grid {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 160px;
+  padding: 10px 0 0 0;
+  border-bottom: 1px solid var(--border-card);
+  position: relative;
+}
+
+.bar-chart-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.bar-chart-fill {
+  width: 100%;
+  max-width: 24px;
+  background-color: var(--accent);
+  border-radius: 3px 3px 0 0;
+  transition: height var(--transition-fast);
+  position: relative;
+}
+
+.bar-chart-fill.warning {
+  background-color: var(--warning);
+}
+
+.bar-chart-column:hover .bar-chart-fill {
+  filter: brightness(0.92);
+}
+
+.bar-value-tooltip {
+  opacity: 0;
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--surface-dark);
+  color: var(--text-on-dark);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  z-index: 5;
+}
+
+.bar-chart-column:hover .bar-value-tooltip {
+  opacity: 1;
+}
+
+.bar-chart-labels {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 6px;
+}
+
+.bar-chart-label-item {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+}
+
+/* Threshold line reference */
+.chart-threshold-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.75rem;
+}
+
+.threshold-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.threshold-dot.accent {
+  background-color: var(--accent);
+}
+
+.threshold-dot.warning {
+  background-color: var(--warning);
+}
+
+/* --------------------------------------------------------------------------
+   System Status Components (Dashboard widget & Full Status Page)
+   -------------------------------------------------------------------------- */
+.status-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+
+.status-pill-badge.normal {
+  background-color: #E6F4EA;
+  color: #137333;
+  border: 1px solid #CEEAD6;
+}
+
+.status-pill-badge.incident {
+  background-color: var(--warning-subtle);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
+
+.system-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.system-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #ECEAE3;
+}
+
+.system-status-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.system-status-label {
+  color: var(--text-secondary);
+}
+
+.system-status-val {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Full Status Page Hero Banner */
+.status-hero-banner {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.status-hero-banner.all-normal {
+  border-left: 6px solid #137333;
+}
+
+.status-hero-banner.degraded {
+  border-left: 6px solid var(--warning);
+}
+
+.status-hero-title {
+  font-size: 1.35rem;
+  margin-bottom: 0.25rem;
+}
+
+.status-hero-desc {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Progress bar for SLO */
+.slo-progress-track {
+  width: 100%;
+  height: 8px;
+  background-color: #E7E5DD;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.slo-progress-fill {
+  height: 100%;
+  background-color: #137333;
+  border-radius: 9999px;
+}
+
+.slo-progress-fill.warning {
+  background-color: var(--warning);
+}
+
+/* Incident history item */
+.incident-item {
+  padding: 1.15rem 0;
+  border-bottom: 1px solid var(--border-card);
+}
+
+.incident-item:last-child {
+  border-bottom: none;
+}
+
+.incident-date {
+  font-family: var(--font-mono);
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.incident-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.incident-body {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.app-footer {
+  background-color: var(--bg-canvas);
+  border-top: 1px solid var(--border-card);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  padding: 1.75rem 0;
+  margin-top: 3.5rem;
+}
+
+.app-footer .footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-source-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Error Pages (403 & 404)
+   -------------------------------------------------------------------------- */
+.error-page-container {
+  min-height: 55vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.error-code-badge {
+  font-family: var(--font-mono);
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  letter-spacing: -0.04em;
+}
+
+.error-headline {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.error-message {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 480px;
+  margin-bottom: 1.75rem;
+}
+
+.btn-tracker-primary {
+  background-color: var(--surface-dark);
+  color: var(--text-on-dark);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-dark);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.btn-tracker-primary:hover {
+  background-color: #2A2E36;
+  color: var(--text-on-dark);
+  text-decoration: none;
+}
+
+.btn-tracker-secondary {
+  background-color: var(--surface-card);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-card);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.btn-tracker-secondary:hover {
+  background-color: #EAE8E0;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Behavior (Cards 4 -> 2x2 -> 1, Two-Column stack)
+   -------------------------------------------------------------------------- */
+@media (max-width: 991.98px) {
+  .dashboard-grid-two-column {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .card-metric-value {
+    font-size: 1.75rem;
+  }
+  .app-footer .footer-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .status-hero-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

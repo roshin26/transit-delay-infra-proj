@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Route 46A Details | Dublin Transit Delay Tracker{% endblock %}
+{% block title %}Route {{ route.short_name }} | Dublin Transit Delay Tracker{% endblock %}
 
 {% block content %}
 <div class="container-xl py-4">
-  <!-- Back navigation breadcrumb -->
+
+  <!-- Back link -->
   <div class="mb-3">
-    <a href="#" class="small text-secondary d-inline-flex align-items-center gap-1">
+    <a href="{% url 'routes' %}" class="small text-secondary d-inline-flex align-items-center gap-1">
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
       </svg>
@@ -15,345 +16,125 @@
     </a>
   </div>
 
-  <!-- Route Header: Name, Mode, Destination & Status Indicator -->
+  <!-- Route header -->
   <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
     <div>
       <div class="d-flex align-items-center gap-2 mb-1">
         <span class="route-badge h3 mb-0">
           <img src="{% static 'icons/bus.svg' %}" alt="" class="badge-icon" width="22" height="22" aria-hidden="true" />
-          <!-- DATA: route_short_name -->
-          <span>Route 46A</span>
+          <span>Route {{ route.short_name }}</span>
         </span>
         <span class="mode-tag bg-light border px-2 py-0.5 rounded">Dublin Bus</span>
-        <span class="status-pill-badge incident">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-          </svg>
-          Congestion alert
-        </span>
       </div>
-      <!-- DATA: route_destination -->
-      <h1 class="h4 text-secondary mb-0">Phoenix Park (Infirmary Rd) ⇄ Dún Laoghaire Station</h1>
+      <h1 class="h4 text-secondary mb-0">{{ route.long_name }}</h1>
     </div>
 
-    <!-- Live indicator pill -->
     <div class="feed-status-pill text-dark border-secondary">
       <span class="feed-pulse-dot" aria-hidden="true"></span>
-      <!-- DATA: active_vehicles_count -->
-      <span>14 buses tracked live</span>
+      <span>{{ active_vehicles }} bus{{ active_vehicles|pluralize:"es" }} tracked in the last hour</span>
     </div>
   </div>
 
-  <!-- Route Summary Stat Cards (4 columns responsive) -->
-  <!-- DATA: route_summary_stats -->
+  <!-- Summary cards -->
   <div class="row g-3 mb-4">
-    <!-- Stat 1: Average Delay -->
-    <div class="col-12 col-sm-6 col-lg-3">
+
+    <div class="col-12 col-sm-6 col-lg-4">
       <div class="tracker-card h-100">
         <div class="card-metric-label">
           <span>Average delay</span>
-          <span class="text-muted small">Current window</span>
+          <span class="text-muted small">Last hour</span>
         </div>
-        <!-- DATA: route_avg_delay -->
-        <div class="card-metric-value text-warning">+9m 12s</div>
-        <p class="card-subtext">
-          <span class="delta-tag warning">+2m 40s</span> vs scheduled headway
-        </p>
+        {% if avg_delay_display %}
+          <div class="card-metric-value{% if avg_delay_warning %} text-warning{% endif %}">{{ avg_delay_display }}</div>
+        {% else %}
+          <div class="card-metric-value">&mdash;</div>
+        {% endif %}
+        <p class="card-subtext">averaged across all stops on this route</p>
       </div>
     </div>
 
-    <!-- Stat 2: On-time Performance -->
-    <div class="col-12 col-sm-6 col-lg-3">
+    <div class="col-12 col-sm-6 col-lg-4">
       <div class="tracker-card h-100">
         <div class="card-metric-label">
-          <span>On-time arrivals</span>
-          <span class="text-muted small">Window (±3m)</span>
+          <span>On-time readings</span>
+          <span class="text-muted small">Within 2 min</span>
         </div>
-        <!-- DATA: route_on_time_pct -->
-        <div class="card-metric-value">52.1%</div>
-        <p class="card-subtext">
-          <span class="delta-tag warning">-27.9%</span> vs network average
-        </p>
+        {% if on_time_pct is not None %}
+          <div class="card-metric-value">{{ on_time_pct }}%</div>
+        {% else %}
+          <div class="card-metric-value">&mdash;</div>
+        {% endif %}
+        <p class="card-subtext">of stop readings in the last hour</p>
       </div>
     </div>
 
-    <!-- Stat 3: Scheduled Headway -->
-    <div class="col-12 col-sm-6 col-lg-3">
+    <div class="col-12 col-sm-6 col-lg-4">
       <div class="tracker-card h-100">
         <div class="card-metric-label">
-          <span>Scheduled headway</span>
-          <span class="text-muted small">Peak frequency</span>
+          <span>Vehicles tracked</span>
+          <span class="text-muted small">Last hour</span>
         </div>
-        <!-- DATA: route_headway -->
-        <div class="card-metric-value">8 mins</div>
+        <div class="card-metric-value">{{ active_vehicles }}</div>
         <p class="card-subtext">
-          Observed avg headway: <span class="mono-num fw-semibold">14.2 mins</span>
-        </p>
-      </div>
-    </div>
-
-    <!-- Stat 4: Active Fleet Coverage -->
-    <div class="col-12 col-sm-6 col-lg-3">
-      <div class="tracker-card h-100">
-        <div class="card-metric-label">
-          <span>Active vehicles</span>
-          <span class="text-muted small">Corridor fleet</span>
-        </div>
-        <!-- DATA: route_active_fleet -->
-        <div class="card-metric-value">14 / 16</div>
-        <p class="card-subtext">
-          2 vehicles delayed beyond 15m
+          from <span class="mono-num fw-semibold">{{ total_readings }}</span> stop readings
         </p>
       </div>
     </div>
   </div>
 
-  <!-- Hour-by-Hour Delay Chart (Plain HTML/CSS Flex Container) -->
+  <!-- Hourly chart placeholder -->
   <div class="tracker-card mb-4">
-    <div class="d-flex align-items-center justify-content-between mb-1">
-      <h2 class="h5 mb-0">Hourly delay profile: Route 46A</h2>
-      <span class="small text-secondary mono-num">Today (07:00 – 19:00)</span>
-    </div>
-    <p class="text-secondary small mb-3">Mean delay per vehicle run across the corridor. Bars over 5 minutes indicate high congestion.</p>
-
-    <!-- DATA: route_hourly_delay_points -->
-    <div class="chart-container">
-      <div class="bar-chart-grid" style="height: 190px;" aria-label="Hourly delay profile for Route 46A">
-        <!-- 07:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">07:00 · 2m 10s</div>
-          <div class="bar-chart-fill" style="height: 22%;"></div>
-        </div>
-        <!-- 08:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">08:00 · 7m 25s</div>
-          <div class="bar-chart-fill warning" style="height: 74%;"></div>
-        </div>
-        <!-- 09:00 (Peak AM) -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">09:00 · 9m 12s</div>
-          <div class="bar-chart-fill warning" style="height: 92%;"></div>
-        </div>
-        <!-- 10:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">10:00 · 4m 05s</div>
-          <div class="bar-chart-fill" style="height: 40%;"></div>
-        </div>
-        <!-- 11:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">11:00 · 3m 20s</div>
-          <div class="bar-chart-fill" style="height: 33%;"></div>
-        </div>
-        <!-- 12:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">12:00 · 3m 40s</div>
-          <div class="bar-chart-fill" style="height: 37%;"></div>
-        </div>
-        <!-- 13:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">13:00 · 4m 30s</div>
-          <div class="bar-chart-fill" style="height: 45%;"></div>
-        </div>
-        <!-- 14:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">14:00 · 4m 15s</div>
-          <div class="bar-chart-fill" style="height: 42%;"></div>
-        </div>
-        <!-- 15:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">15:00 · 6m 10s</div>
-          <div class="bar-chart-fill warning" style="height: 62%;"></div>
-        </div>
-        <!-- 16:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">16:00 · 8m 45s</div>
-          <div class="bar-chart-fill warning" style="height: 88%;"></div>
-        </div>
-        <!-- 17:00 (Peak PM) -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">17:00 · 9m 30s</div>
-          <div class="bar-chart-fill warning" style="height: 95%;"></div>
-        </div>
-        <!-- 18:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">18:00 · 8m 10s</div>
-          <div class="bar-chart-fill warning" style="height: 81%;"></div>
-        </div>
-        <!-- 19:00 -->
-        <div class="bar-chart-column">
-          <div class="bar-value-tooltip">19:00 · 5m 05s</div>
-          <div class="bar-chart-fill warning" style="height: 51%;"></div>
-        </div>
-      </div>
-
-      <!-- X-axis Hour Labels -->
-      <div class="bar-chart-labels" aria-hidden="true">
-        <span class="bar-chart-label-item">07:00</span>
-        <span class="bar-chart-label-item">08:00</span>
-        <span class="bar-chart-label-item">09:00</span>
-        <span class="bar-chart-label-item">10:00</span>
-        <span class="bar-chart-label-item">11:00</span>
-        <span class="bar-chart-label-item">12:00</span>
-        <span class="bar-chart-label-item">13:00</span>
-        <span class="bar-chart-label-item">14:00</span>
-        <span class="bar-chart-label-item">15:00</span>
-        <span class="bar-chart-label-item">16:00</span>
-        <span class="bar-chart-label-item">17:00</span>
-        <span class="bar-chart-label-item">18:00</span>
-        <span class="bar-chart-label-item">19:00</span>
-      </div>
-
-      <!-- Legend -->
-      <div class="chart-threshold-legend">
-        <span class="d-inline-flex align-items-center gap-1">
-          <span class="threshold-dot accent" aria-hidden="true"></span>
-          <span>≤ 5m delay (on schedule)</span>
-        </span>
-        <span class="d-inline-flex align-items-center gap-1">
-          <span class="threshold-dot warning" aria-hidden="true"></span>
-          <span>&gt; 5m delay (bottleneck / pinch point)</span>
-        </span>
-      </div>
-    </div>
+    <h2 class="h5 mb-1">Hourly delay profile</h2>
+    <p class="text-secondary small mb-0">
+      Coming soon: this chart needs a day or more of stored readings. It will show
+      the average delay per hour for Route {{ route.short_name }}.
+    </p>
   </div>
 
-  <!-- Most Delayed Stops Table -->
+  <!-- Most delayed stops -->
   <div class="tracker-card">
     <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
       <div>
-        <h2 class="h5 mb-0">Most delayed stops on Route 46A</h2>
-        <p class="text-secondary small mb-0">Identified pinch points where boarding and dwell delays accumulate.</p>
+        <h2 class="h5 mb-0">Most delayed stops on Route {{ route.short_name }}</h2>
+        <p class="text-secondary small mb-0">Ranked by average delay over the last hour.</p>
       </div>
-      <span class="text-secondary small mono-num">6 stops identified</span>
+      {% if stops %}
+        <span class="text-secondary small mono-num">Top {{ stops|length }} stop{{ stops|length|pluralize }}</span>
+      {% endif %}
     </div>
 
     <div class="table-responsive-wrapper">
-      <table class="tracker-table" aria-label="Most delayed stops along Route 46A corridor">
+      <table class="tracker-table" aria-label="Most delayed stops on Route {{ route.short_name }}">
         <thead>
           <tr>
-            <th scope="col" style="min-width: 100px;">Stop ID</th>
-            <th scope="col" style="min-width: 220px;">Stop Name</th>
-            <th scope="col" style="min-width: 160px;">Corridor Zone</th>
-            <th scope="col" style="min-width: 170px;">Mean Delay</th>
-            <th scope="col" class="text-end" style="min-width: 140px;">Max Observed Delay</th>
+            <th scope="col" style="min-width: 140px;">Stop ID</th>
+            <th scope="col" style="min-width: 170px;">Mean delay</th>
+            <th scope="col" class="text-end" style="min-width: 140px;">Max observed delay</th>
+            <th scope="col" class="text-end" style="min-width: 100px;">Readings</th>
           </tr>
         </thead>
         <tbody>
-          <!-- DATA: list of most delayed stops for this route -->
-
-          <!-- Stop 1: Leeson Street Bridge -->
+          {% for stop in stops %}
           <tr>
-            <td class="mono-num fw-semibold">#784</td>
-            <td>
-              <div class="fw-semibold">Leeson St Bridge</div>
-              <div class="text-secondary small">Stop 784, Sussex Road</div>
-            </td>
-            <td>City Centre South / Canal</td>
+            <td class="mono-num fw-semibold">{{ stop.stop_id }}</td>
             <td>
               <div class="delay-bar-container">
                 <div class="delay-bar-track">
-                  <div class="delay-bar-fill warning" style="width: 95%;"></div>
+                  <div class="delay-bar-fill{% if stop.is_warning %} warning{% endif %}" style="width: {{ stop.bar_pct }}%;"></div>
                 </div>
-                <span class="delay-bar-value warning">+6m 40s</span>
+                <span class="delay-bar-value {% if stop.is_warning %}warning{% else %}accent{% endif %}">{{ stop.delay_display }}</span>
               </div>
             </td>
-            <td class="text-end mono-num fw-semibold text-warning">+14m 10s</td>
+            <td class="text-end mono-num fw-semibold">{{ stop.max_display }}</td>
+            <td class="text-end mono-num">{{ stop.reading_count }}</td>
           </tr>
-
-          <!-- Stop 2: Donnybrook Church -->
+          {% empty %}
           <tr>
-            <td class="mono-num fw-semibold">#758</td>
-            <td>
-              <div class="fw-semibold">Donnybrook Church</div>
-              <div class="text-secondary small">Stop 758, Morehampton Road</div>
+            <td colspan="4" class="text-secondary text-center py-4">
+              No readings for this route in the last hour. Run <code>python manage.py fetch_delays</code>, or try a busier route.
             </td>
-            <td>Donnybrook Village</td>
-            <td>
-              <div class="delay-bar-container">
-                <div class="delay-bar-track">
-                  <div class="delay-bar-fill warning" style="width: 82%;"></div>
-                </div>
-                <span class="delay-bar-value warning">+5m 30s</span>
-              </div>
-            </td>
-            <td class="text-end mono-num fw-semibold text-warning">+11m 45s</td>
           </tr>
-
-          <!-- Stop 3: O'Connell St Lower -->
-          <tr>
-            <td class="mono-num fw-semibold">#271</td>
-            <td>
-              <div class="fw-semibold">O'Connell St Lower</div>
-              <div class="text-secondary small">Stop 271, near Abbey St Junction</div>
-            </td>
-            <td>City Centre North</td>
-            <td>
-              <div class="delay-bar-container">
-                <div class="delay-bar-track">
-                  <div class="delay-bar-fill warning" style="width: 76%;"></div>
-                </div>
-                <span class="delay-bar-value warning">+4m 55s</span>
-              </div>
-            </td>
-            <td class="text-end mono-num fw-semibold text-warning">+9m 20s</td>
-          </tr>
-
-          <!-- Stop 4: UCD Slip Road / Stillorgan -->
-          <tr>
-            <td class="mono-num fw-semibold">#768</td>
-            <td>
-              <div class="fw-semibold">UCD Belfield Slip Road</div>
-              <div class="text-secondary small">Stop 768, Stillorgan Road (N11)</div>
-            </td>
-            <td>Stillorgan Quality Bus Corridor</td>
-            <td>
-              <div class="delay-bar-container">
-                <div class="delay-bar-track">
-                  <div class="delay-bar-fill" style="width: 60%;"></div>
-                </div>
-                <span class="delay-bar-value accent">+3m 45s</span>
-              </div>
-            </td>
-            <td class="text-end mono-num fw-semibold">+7m 30s</td>
-          </tr>
-
-          <!-- Stop 5: Foxrock Church -->
-          <tr>
-            <td class="mono-num fw-semibold">#2007</td>
-            <td>
-              <div class="fw-semibold">Foxrock Church</div>
-              <div class="text-secondary small">Stop 2007, Westminster Road</div>
-            </td>
-            <td>Foxrock / N11 Junction</td>
-            <td>
-              <div class="delay-bar-container">
-                <div class="delay-bar-track">
-                  <div class="delay-bar-fill" style="width: 48%;"></div>
-                </div>
-                <span class="delay-bar-value accent">+2m 50s</span>
-              </div>
-            </td>
-            <td class="text-end mono-num fw-semibold">+5m 40s</td>
-          </tr>
-
-          <!-- Stop 6: Dún Laoghaire Station -->
-          <tr>
-            <td class="mono-num fw-semibold">#2034</td>
-            <td>
-              <div class="fw-semibold">Dún Laoghaire Station</div>
-              <div class="text-secondary small">Stop 2034, Crofton Road Terminus</div>
-            </td>
-            <td>Coastal Terminus</td>
-            <td>
-              <div class="delay-bar-container">
-                <div class="delay-bar-track">
-                  <div class="delay-bar-fill" style="width: 32%;"></div>
-                </div>
-                <span class="delay-bar-value accent">+1m 50s</span>
-              </div>
-            </td>
-            <td class="text-end mono-num fw-semibold">+4m 15s</td>
-          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>

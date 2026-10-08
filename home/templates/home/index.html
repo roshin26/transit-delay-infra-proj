@@ -5,516 +5,189 @@
 
 {% block content %}
 <div class="container-xl py-4">
-  <!-- Page Header & Headline -->
+
+  <!-- Page header -->
   <div class="mb-4">
     <h1 class="h2 mb-1">How is Dublin moving right now?</h1>
-    <p class="text-secondary mb-0">Live headway variance and punctuality across Dublin Bus and Luas tram networks.</p>
+    <p class="text-secondary mb-0">
+      Live Dublin Bus delays, calculated from the NTA real-time feed.
+      Showing the last hour of readings.
+    </p>
   </div>
 
-  <!-- Filters Row: Mode Segmented Control + Time Window Select -->
-  <div class="filter-bar-container">
-    <!-- Mode filter segmented control -->
-    <div class="segmented-control" role="group" aria-label="Transit Mode Filter">
-      <button type="button" class="btn-segment active" data-mode="all" aria-pressed="true">
-        All Modes
-      </button>
-      <button type="button" class="btn-segment" data-mode="bus" aria-pressed="false">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" aria-hidden="true">
-          <path d="M8 6v6"/><path d="M16 6v6"/><path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2H7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/><circle cx="7" cy="15" r="1"/><circle cx="17" cy="15" r="1"/>
-        </svg>
-        Bus
-      </button>
-      <button type="button" class="btn-segment" data-mode="luas" aria-pressed="false">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" aria-hidden="true">
-          <rect x="4" y="3" width="16" height="15" rx="3"/><line x1="4" y1="11" x2="20" y2="11"/><line x1="8" y1="3" x2="8" y2="11"/><line x1="16" y1="3" x2="16" y2="11"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/><path d="M12 3V1"/><path d="M8 1h8"/><path d="M6 18l-2 3"/><path d="M18 18l2 3"/>
-        </svg>
-        Luas
-      </button>
-    </div>
-
-    <!-- Time window selection -->
-    <div class="d-flex align-items-center gap-2">
-      <label for="timeWindowSelect" class="text-secondary small fw-medium mb-0">Window:</label>
-      <select id="timeWindowSelect" class="filter-select" aria-label="Select aggregation time window">
-        <option value="last_hour" selected>Last hour</option>
-        <option value="today">Today</option>
-        <option value="last_7_days">Last 7 days</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- Four Metric Summary Cards (Responsive: 4 -> 2x2 -> stacked) -->
-  <!-- DATA: Overall Network Summary Metrics -->
+  <!-- Four summary cards -->
   <div class="row g-3 mb-4">
-    <!-- Card 1: Network On-Time -->
+
+    <!-- Card 1: Network on time -->
     <div class="col-12 col-sm-6 col-lg-3">
       <div class="tracker-card h-100">
         <div class="card-metric-label">
           <span>Network on time</span>
-          <span class="text-muted small">Target 80%</span>
         </div>
-        <!-- DATA: network_on_time_pct -->
-        <div class="card-metric-value">78.4%</div>
-        <p class="card-subtext">
-          <!-- DATA: on_time_delta_vs_target -->
-          <span class="delta-tag warning">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
-            </svg>
-            -1.6%
-          </span>
-          below regulatory target
-        </p>
+        <div class="card-metric-value">{{ on_time_pct }}%</div>
+        <p class="card-subtext">of stop readings within 2 min of schedule</p>
       </div>
     </div>
 
-    <!-- Card 2: Average Delay -->
+    <!-- Card 2: Average delay -->
     <div class="col-12 col-sm-6 col-lg-3">
       <div class="tracker-card h-100">
         <div class="card-metric-label">
           <span>Average delay</span>
           <span class="text-muted small">Citywide</span>
         </div>
-        <!-- DATA: avg_delay_time -->
-        <div class="card-metric-value">3m 40s</div>
-        <p class="card-subtext">
-          <!-- DATA: delay_delta_vs_yesterday -->
-          <span class="delta-tag warning">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-            </svg>
-            +45s
-          </span>
-          vs same hour yesterday
-        </p>
+        <div class="card-metric-value">{{ avg_delay_display }}</div>
+        <p class="card-subtext">averaged across all stops, last hour</p>
       </div>
     </div>
 
-    <!-- Card 3: Vehicles Tracked -->
+    <!-- Card 3: Vehicles tracked -->
     <div class="col-12 col-sm-6 col-lg-3">
       <div class="tracker-card h-100">
         <div class="card-metric-label">
           <span>Vehicles tracked</span>
           <span class="text-muted small">Active feed</span>
         </div>
-        <!-- DATA: vehicles_tracked_count -->
-        <div class="card-metric-value">842</div>
+        <div class="card-metric-value">{{ vehicles_tracked }}</div>
         <p class="card-subtext">
-          <!-- DATA: routes_active_count -->
-          Across <span class="mono-num fw-semibold">126</span> routes right now
+          Across <span class="mono-num fw-semibold">{{ routes_tracked }}</span> Dublin Bus routes
         </p>
       </div>
     </div>
 
-    <!-- Card 4: Most Delayed Route (Dark Highlighted Card) -->
+    <!-- Card 4: Most delayed route (dark card) -->
     <div class="col-12 col-sm-6 col-lg-3">
       <div class="tracker-card dark-highlight h-100">
         <div class="card-metric-label">
           <span>Most delayed route</span>
-          <span class="status-pill-badge incident">Critical</span>
         </div>
-        <!-- DATA: most_delayed_route_number -->
-        <div class="card-metric-value text-white">Route 46A</div>
-        <p class="card-subtext">
-          <!-- DATA: most_delayed_route_direction & delay_avg -->
-          Towards <span class="text-white">Dún Laoghaire</span> · <span class="text-warning fw-semibold mono-num">+9m 12s</span> avg
-        </p>
+        {% if most_delayed %}
+          <div class="card-metric-value text-white">Route {{ most_delayed.route__short_name }}</div>
+          <p class="card-subtext">
+            <span class="text-white">{{ most_delayed.route__long_name }}</span><br>
+            <span class="text-warning fw-semibold mono-num">{{ most_delayed.delay_display }}</span> avg delay
+          </p>
+        {% else %}
+          <div class="card-metric-value text-white">&mdash;</div>
+          <p class="card-subtext">No readings in the last hour</p>
+        {% endif %}
       </div>
     </div>
   </div>
 
-  <!-- Two Column Layout: Left Wider (Most Delayed Routes Table), Right (Hour Bar Chart & Status) -->
+  <!-- Two-column layout -->
   <div class="row g-4 dashboard-grid-two-column">
-    <!-- Left Column: Most Delayed Routes Table -->
+
+    <!-- Left: most delayed routes table -->
     <div class="col-12 col-lg-7 col-xl-8">
       <div class="tracker-card">
         <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
           <div>
             <h2 class="h5 mb-0">Most delayed routes</h2>
-            <p class="text-secondary small mb-0">Ranked by mean scheduled vs observed arrival delay</p>
+            <p class="text-secondary small mb-0">Ranked by average delay over the last hour</p>
           </div>
-          <a href="#" class="small fw-semibold">View all routes →</a>
+          <!-- TODO: swap href for {% url 'routes' %} once your routes list URL is named -->
+          <a href="#" class="small fw-semibold">View all routes &rarr;</a>
         </div>
 
         <div class="table-responsive-wrapper">
-          <table class="tracker-table" aria-label="Most delayed Dublin transit routes">
+          <table class="tracker-table" aria-label="Most delayed Dublin Bus routes">
             <thead>
               <tr>
                 <th scope="col">Route</th>
                 <th scope="col">Towards</th>
                 <th scope="col" style="min-width: 170px;">Avg delay</th>
-                <th scope="col" class="text-end">On time %</th>
-                <th scope="col" class="text-end">Trend</th>
+                <th scope="col" class="text-end">Readings</th>
               </tr>
             </thead>
             <tbody>
-              <!-- DATA: list of delayed routes -->
-
-              <!-- Row 1: 46A Bus -->
-              <tr data-mode="bus" data-search="46A Dun Laoghaire Bus">
+              {% for route in top_delayed_routes %}
+              <tr>
                 <td>
-                  <a href="#" class="route-badge text-dark" aria-label="Route 46A details">
+                  <!-- TODO: link to the route detail page with {% url 'route_detail' route.route__route_id %} -->
+                  <a href="#" class="route-badge text-dark" aria-label="Route {{ route.route__short_name }} details">
                     <img src="{% static 'icons/bus.svg' %}" alt="" class="badge-icon" aria-hidden="true" />
-                    <span>46A</span>
+                    <span>{{ route.route__short_name }}</span>
                   </a>
-                  <div class="mode-tag">Bus</div>
                 </td>
-                <td>Dún Laoghaire Station</td>
+                <td>{{ route.route__long_name }}</td>
                 <td>
                   <div class="delay-bar-container">
                     <div class="delay-bar-track">
-                      <div class="delay-bar-fill warning" style="width: 88%;"></div>
+                      <div class="delay-bar-fill{% if route.is_warning %} warning{% endif %}" style="width: {{ route.bar_pct }}%;"></div>
                     </div>
-                    <!-- DATA: delay value -->
-                    <span class="delay-bar-value warning">+9m 12s</span>
+                    <span class="delay-bar-value {% if route.is_warning %}warning{% else %}accent{% endif %}">{{ route.delay_display }}</span>
                   </div>
                 </td>
-                <td class="text-end mono-num">52.1%</td>
-                <td class="text-end">
-                  <span class="trend-indicator worsening">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                    </svg>
-                    Worsening
-                  </span>
+                <td class="text-end mono-num">{{ route.reading_count }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-secondary text-center py-4">
+                  No readings in the last hour. Run <code>python manage.py fetch_delays</code> to load some.
                 </td>
               </tr>
-
-              <!-- Row 2: Red Line Luas -->
-              <tr data-mode="luas" data-search="Red Line Luas Tallaght The Point">
-                <td>
-                  <a href="#" class="route-badge text-dark" aria-label="Luas Red Line details">
-                    <img src="{% static 'icons/tram.svg' %}" alt="" class="badge-icon" aria-hidden="true" />
-                    <span>Red Line</span>
-                  </a>
-                  <div class="mode-tag">Luas</div>
-                </td>
-                <td>Tallaght / The Point</td>
-                <td>
-                  <div class="delay-bar-container">
-                    <div class="delay-bar-track">
-                      <div class="delay-bar-fill warning" style="width: 74%;"></div>
-                    </div>
-                    <span class="delay-bar-value warning">+7m 45s</span>
-                  </div>
-                </td>
-                <td class="text-end mono-num">64.0%</td>
-                <td class="text-end">
-                  <span class="trend-indicator worsening">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                    </svg>
-                    Worsening
-                  </span>
-                </td>
-              </tr>
-
-              <!-- Row 3: 39A Bus -->
-              <tr data-mode="bus" data-search="39A Ongar UCD Belfield Bus">
-                <td>
-                  <a href="#" class="route-badge text-dark" aria-label="Route 39A details">
-                    <img src="{% static 'icons/bus.svg' %}" alt="" class="badge-icon" aria-hidden="true" />
-                    <span>39A</span>
-                  </a>
-                  <div class="mode-tag">Bus</div>
-                </td>
-                <td>UCD Belfield</td>
-                <td>
-                  <div class="delay-bar-container">
-                    <div class="delay-bar-track">
-                      <div class="delay-bar-fill warning" style="width: 65%;"></div>
-                    </div>
-                    <span class="delay-bar-value warning">+6m 20s</span>
-                  </div>
-                </td>
-                <td class="text-end mono-num">68.5%</td>
-                <td class="text-end">
-                  <span class="trend-indicator steady">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="15 8 19 12 15 16"/>
-                    </svg>
-                    Steady
-                  </span>
-                </td>
-              </tr>
-
-              <!-- Row 4: 15 Bus -->
-              <tr data-mode="bus" data-search="15 Clongriffin Ballycullen Road Bus">
-                <td>
-                  <a href="#" class="route-badge text-dark" aria-label="Route 15 details">
-                    <img src="{% static 'icons/bus.svg' %}" alt="" class="badge-icon" aria-hidden="true" />
-                    <span>15</span>
-                  </a>
-                  <div class="mode-tag">Bus</div>
-                </td>
-                <td>Ballycullen Road</td>
-                <td>
-                  <div class="delay-bar-container">
-                    <div class="delay-bar-track">
-                      <div class="delay-bar-fill warning" style="width: 58%;"></div>
-                    </div>
-                    <span class="delay-bar-value warning">+5m 45s</span>
-                  </div>
-                </td>
-                <td class="text-end mono-num">71.2%</td>
-                <td class="text-end">
-                  <span class="trend-indicator improving">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
-                    </svg>
-                    Improving
-                  </span>
-                </td>
-              </tr>
-
-              <!-- Row 5: Green Line Luas -->
-              <tr data-mode="luas" data-search="Green Line Luas Broombridge Brides Glen">
-                <td>
-                  <a href="#" class="route-badge text-dark" aria-label="Luas Green Line details">
-                    <img src="{% static 'icons/tram.svg' %}" alt="" class="badge-icon" aria-hidden="true" />
-                    <span>Green Line</span>
-                  </a>
-                  <div class="mode-tag">Luas</div>
-                </td>
-                <td>Broombridge / Brides Glen</td>
-                <td>
-                  <div class="delay-bar-container">
-                    <div class="delay-bar-track">
-                      <div class="delay-bar-fill" style="width: 44%;"></div>
-                    </div>
-                    <span class="delay-bar-value accent">+4m 10s</span>
-                  </div>
-                </td>
-                <td class="text-end mono-num">79.8%</td>
-                <td class="text-end">
-                  <span class="trend-indicator steady">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="15 8 19 12 15 16"/>
-                    </svg>
-                    Steady
-                  </span>
-                </td>
-              </tr>
-
-              <!-- Row 6: 140 Bus -->
-              <tr data-mode="bus" data-search="140 Finglas Rathmines Bus">
-                <td>
-                  <a href="#" class="route-badge text-dark" aria-label="Route 140 details">
-                    <img src="{% static 'icons/bus.svg' %}" alt="" class="badge-icon" aria-hidden="true" />
-                    <span>140</span>
-                  </a>
-                  <div class="mode-tag">Bus</div>
-                </td>
-                <td>Rathmines (Palmerston Park)</td>
-                <td>
-                  <div class="delay-bar-container">
-                    <div class="delay-bar-track">
-                      <div class="delay-bar-fill" style="width: 38%;"></div>
-                    </div>
-                    <span class="delay-bar-value accent">+3m 50s</span>
-                  </div>
-                </td>
-                <td class="text-end mono-num">82.4%</td>
-                <td class="text-end">
-                  <span class="trend-indicator improving">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
-                    </svg>
-                    Improving
-                  </span>
-                </td>
-              </tr>
-
-              <!-- Row 7: C1 Bus -->
-              <tr data-mode="bus" data-search="C1 Adamstown Station Ringsend Bus Spine">
-                <td>
-                  <a href="#" class="route-badge text-dark" aria-label="Route C1 details">
-                    <img src="{% static 'icons/bus.svg' %}" alt="" class="badge-icon" aria-hidden="true" />
-                    <span>C1</span>
-                  </a>
-                  <div class="mode-tag">Bus</div>
-                </td>
-                <td>Ringsend Road</td>
-                <td>
-                  <div class="delay-bar-container">
-                    <div class="delay-bar-track">
-                      <div class="delay-bar-fill" style="width: 32%;"></div>
-                    </div>
-                    <span class="delay-bar-value accent">+3m 15s</span>
-                  </div>
-                </td>
-                <td class="text-end mono-num">84.9%</td>
-                <td class="text-end">
-                  <span class="trend-indicator steady">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="15 8 19 12 15 16"/>
-                    </svg>
-                    Steady
-                  </span>
-                </td>
-              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- Right Column: Top Chart + Bottom Compact System Status -->
+    <!-- Right column -->
     <div class="col-12 col-lg-5 col-xl-4">
       <div class="d-flex flex-column gap-4">
-        <!-- Right Top: Route 46A by hour bar chart (pure HTML/CSS divs) -->
+
+        <!-- Placeholder for the hourly chart (needs more history first) -->
         <div class="tracker-card">
-          <div class="d-flex align-items-center justify-content-between mb-1">
-            <h2 class="h5 mb-0">Route 46A by hour</h2>
-            <span class="small text-secondary mono-num">Today</span>
-          </div>
-          <p class="text-secondary small mb-3">Average delay in minutes. Bars &gt; 5 min highlighted.</p>
-
-          <!-- DATA: hour-by-hour delay data for Route 46A -->
-          <div class="chart-container">
-            <div class="bar-chart-grid" aria-label="Hourly average delay bar chart for Route 46A">
-              <!-- 07:00 -> 2m (20% height, <= 5m -> accent) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">07:00 · 2m 10s</div>
-                <div class="bar-chart-fill" style="height: 22%;"></div>
-              </div>
-              <!-- 08:00 -> 7m (70% height, > 5m -> warning) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">08:00 · 7m 25s</div>
-                <div class="bar-chart-fill warning" style="height: 74%;"></div>
-              </div>
-              <!-- 09:00 -> 9m (92% height, > 5m -> warning) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">09:00 · 9m 12s</div>
-                <div class="bar-chart-fill warning" style="height: 92%;"></div>
-              </div>
-              <!-- 10:00 -> 4m (40% height, <= 5m -> accent) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">10:00 · 4m 05s</div>
-                <div class="bar-chart-fill" style="height: 40%;"></div>
-              </div>
-              <!-- 11:00 -> 3m (30% height, <= 5m -> accent) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">11:00 · 3m 20s</div>
-                <div class="bar-chart-fill" style="height: 33%;"></div>
-              </div>
-              <!-- 12:00 -> 3m 40s (36% height, <= 5m -> accent) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">12:00 · 3m 40s</div>
-                <div class="bar-chart-fill" style="height: 37%;"></div>
-              </div>
-              <!-- 13:00 -> 4m 30s (45% height, <= 5m -> accent) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">13:00 · 4m 30s</div>
-                <div class="bar-chart-fill" style="height: 45%;"></div>
-              </div>
-              <!-- 14:00 -> 4m 15s (42% height, <= 5m -> accent) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">14:00 · 4m 15s</div>
-                <div class="bar-chart-fill" style="height: 42%;"></div>
-              </div>
-              <!-- 15:00 -> 6m 10s (62% height, > 5m -> warning) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">15:00 · 6m 10s</div>
-                <div class="bar-chart-fill warning" style="height: 62%;"></div>
-              </div>
-              <!-- 16:00 -> 8m 45s (88% height, > 5m -> warning) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">16:00 · 8m 45s</div>
-                <div class="bar-chart-fill warning" style="height: 88%;"></div>
-              </div>
-              <!-- 17:00 -> 9m 30s (95% height, > 5m -> warning) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">17:00 · 9m 30s</div>
-                <div class="bar-chart-fill warning" style="height: 95%;"></div>
-              </div>
-              <!-- 18:00 -> 8m 10s (81% height, > 5m -> warning) -->
-              <div class="bar-chart-column">
-                <div class="bar-value-tooltip">18:00 · 8m 10s</div>
-                <div class="bar-chart-fill warning" style="height: 81%;"></div>
-              </div>
-            </div>
-
-            <!-- Hour Labels -->
-            <div class="bar-chart-labels" aria-hidden="true">
-              <span class="bar-chart-label-item">07h</span>
-              <span class="bar-chart-label-item">08h</span>
-              <span class="bar-chart-label-item">09h</span>
-              <span class="bar-chart-label-item">10h</span>
-              <span class="bar-chart-label-item">11h</span>
-              <span class="bar-chart-label-item">12h</span>
-              <span class="bar-chart-label-item">13h</span>
-              <span class="bar-chart-label-item">14h</span>
-              <span class="bar-chart-label-item">15h</span>
-              <span class="bar-chart-label-item">16h</span>
-              <span class="bar-chart-label-item">17h</span>
-              <span class="bar-chart-label-item">18h</span>
-            </div>
-
-            <!-- Legend -->
-            <div class="chart-threshold-legend">
-              <span class="d-inline-flex align-items-center gap-1">
-                <span class="threshold-dot accent" aria-hidden="true"></span>
-                <span>≤ 5m delay (nominal)</span>
-              </span>
-              <span class="d-inline-flex align-items-center gap-1">
-                <span class="threshold-dot warning" aria-hidden="true"></span>
-                <span>&gt; 5m delay (congested)</span>
-              </span>
-            </div>
-          </div>
+          <h2 class="h5 mb-1">Delay by hour</h2>
+          <p class="text-secondary small mb-0">
+            Coming soon: this chart needs a day or more of stored readings.
+            It will show the average delay per hour for a chosen route.
+          </p>
         </div>
 
-        <!-- Right Bottom: Compact System Status Panel -->
+        <!-- System status -->
         <div class="tracker-card">
           <div class="d-flex align-items-center justify-content-between mb-3">
             <h2 class="h5 mb-0">System status</h2>
-            <!-- DATA: overall_status_badge -->
-            <span class="status-pill-badge normal">
-              <span class="feed-pulse-dot" style="width: 6px; height: 6px;" aria-hidden="true"></span>
-              All systems normal
-            </span>
+            {% if latest_fetch and latest_fetch.success %}
+              <span class="status-pill-badge normal">
+                <span class="feed-pulse-dot" style="width: 6px; height: 6px;" aria-hidden="true"></span>
+                Feed healthy
+              </span>
+            {% elif latest_fetch %}
+              <span class="status-pill-badge incident">Last fetch failed</span>
+            {% else %}
+              <span class="status-pill-badge incident">No fetches yet</span>
+            {% endif %}
           </div>
 
           <div class="system-status-list">
-            <!-- Row 1: Freshness SLO -->
-            <div class="system-status-row">
-              <span class="system-status-label">Freshness SLO vs target</span>
-              <!-- DATA: freshness_slo_actual & target -->
-              <span class="system-status-val">99.8% <span class="text-secondary fw-normal">/ 99.0%</span></span>
-            </div>
-
-            <!-- Row 2: API p95 latency -->
-            <div class="system-status-row">
-              <span class="system-status-label">API p95 latency</span>
-              <!-- DATA: api_p95_latency_ms -->
-              <span class="system-status-val">84ms</span>
-            </div>
-
-            <!-- Row 3: Worker queue depth -->
-            <div class="system-status-row">
-              <span class="system-status-label">Worker queue depth</span>
-              <!-- DATA: queue_depth_count -->
-              <span class="system-status-val">0 tasks</span>
-            </div>
-
-            <!-- Row 4: Last feed fetch -->
             <div class="system-status-row">
               <span class="system-status-label">Last feed fetch</span>
-              <!-- DATA: last_feed_timestamp -->
-              <span class="system-status-val">38s ago</span>
+              <span class="system-status-val">
+                {% if latest_fetch %}{{ latest_fetch.fetched_at|timesince }} ago{% else %}never{% endif %}
+              </span>
+            </div>
+            <div class="system-status-row">
+              <span class="system-status-label">Readings in last fetch</span>
+              <span class="system-status-val">
+                {% if latest_fetch %}{{ latest_fetch.record_count }}{% else %}&mdash;{% endif %}
+              </span>
+            </div>
+            <!-- These three get real values once /metrics and the SLO are in place -->
+            <div class="system-status-row">
+              <span class="system-status-label">Freshness SLO</span>
+              <span class="system-status-val text-secondary">&mdash;</span>
+            </div>
+            <div class="system-status-row">
+              <span class="system-status-label">API p95 latency</span>
+              <span class="system-status-val text-secondary">&mdash;</span>
             </div>
           </div>
-
-          <div class="mt-3 pt-2 border-top">
-            <a href="#" class="small fw-semibold d-inline-flex align-items-center gap-1">
-              <span>View detailed system telemetry</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </a>
-          </div>
         </div>
+
       </div>
     </div>
   </div>

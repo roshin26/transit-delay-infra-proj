@@ -107,7 +107,7 @@
       <table class="tracker-table" aria-label="Most delayed stops on Route {{ route.short_name }}">
         <thead>
           <tr>
-            <th scope="col" style="min-width: 140px;">Stop ID</th>
+            <th scope="col" style="min-width: 220px;">Stop</th>
             <th scope="col" style="min-width: 170px;">Mean delay</th>
             <th scope="col" class="text-end" style="min-width: 140px;">Max observed delay</th>
             <th scope="col" class="text-end" style="min-width: 100px;">Readings</th>
@@ -116,7 +116,10 @@
         <tbody>
           {% for stop in stops %}
           <tr>
-            <td class="mono-num fw-semibold">{{ stop.stop_id }}</td>
+            <td>
+              <div class="fw-semibold">{{ stop.name|default:stop.stop_id }}</div>
+              <div class="text-secondary small mono-num">{{ stop.stop_id }}</div>
+            </td>
             <td>
               <div class="delay-bar-container">
                 <div class="delay-bar-track">

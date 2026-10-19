@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+from .models import DelayReading, Route, Stop
 from django.db.models import Avg, Count, Max, Q
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
@@ -92,6 +92,13 @@ def route_detail(request, route_id):
         .order_by('-avg_delay')[:10]
     )
     add_bar_widths(stops)
+    names = dict(
+    Stop.objects
+    .filter(stop_id__in=[s['stop_id'] for s in stops])
+    .values_list('stop_id', 'name')
+)
+    for stop in stops:
+        stop['name'] = names.get(stop['stop_id'], '')
     for stop in stops:
         stop['max_display'] = format_duration(stop['max_delay'])
 

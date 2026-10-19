@@ -31,3 +31,10 @@ class FetchLog(models.Model):
 
     class Meta:
         ordering = ['-fetched_at']
+
+class Stop(models.Model):
+    stop_id = models.CharField(max_length=50, primary_key=True)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name

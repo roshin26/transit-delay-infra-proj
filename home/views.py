@@ -10,6 +10,8 @@ def format_duration(seconds):
     seconds = round(seconds or 0)
     sign = '-' if seconds < 0 else ''
     seconds = abs(seconds)
+    if seconds < 60:
+        return f"{sign}{seconds}s"
     return f"{sign}{seconds // 60}m {seconds % 60:02d}s"
 
 
@@ -18,11 +20,16 @@ def index(request):
     recent = DelayReading.objects.filter(recorded_at__gte=since)
 
     route_stats = (
-        recent
-        .values('route__route_id', 'route__short_name', 'route__long_name')
-        .annotate(avg_delay=Avg('delay_seconds'), reading_count=Count('id'))
-        .order_by('-avg_delay')
+    recent
+    .values('route__route_id', 'route__short_name', 'route__long_name')
+    .annotate(
+        avg_delay=Avg('delay_seconds'),
+        reading_count=Count('id'),
+        trip_count=Count('trip_id', distinct=True),
     )
+    .filter(trip_count__gte=3)
+    .order_by('-avg_delay')
+)
 
     top = list(route_stats[:10])
     max_delay = max((r['avg_delay'] for r in top), default=0)

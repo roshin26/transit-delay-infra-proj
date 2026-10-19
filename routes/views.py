@@ -13,10 +13,11 @@ ON_TIME_SECONDS = 120
 
 
 def format_duration(seconds):
-    """Turn a number of seconds into text like '3m 40s'."""
     seconds = round(seconds or 0)
     sign = '-' if seconds < 0 else ''
     seconds = abs(seconds)
+    if seconds < 60:
+        return f"{sign}{seconds}s"
     return f"{sign}{seconds // 60}m {seconds % 60:02d}s"
 
 

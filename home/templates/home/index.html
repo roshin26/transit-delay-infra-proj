@@ -25,7 +25,7 @@
           <span>Network on time</span>
         </div>
         <div class="card-metric-value">{{ on_time_pct }}%</div>
-        <p class="card-subtext">of stop readings within 2 min of schedule</p>
+        <p class="card-subtext">of bus readings within 2 min of schedule</p>
       </div>
     </div>
 
@@ -37,7 +37,7 @@
           <span class="text-muted small">Citywide</span>
         </div>
         <div class="card-metric-value">{{ avg_delay_display }}</div>
-        <p class="card-subtext">averaged across all stops, last hour</p>
+        <p class="card-subtext">averaged across all buses, last hour</p>
       </div>
     </div>
 
@@ -86,8 +86,7 @@
             <h2 class="h5 mb-0">Most delayed routes</h2>
             <p class="text-secondary small mb-0">Ranked by average delay over the last hour</p>
           </div>
-          <!-- TODO: swap href for {% url 'routes' %} once your routes list URL is named -->
-          <a href="#" class="small fw-semibold">View all routes &rarr;</a>
+          <a href="{% url 'routes' %}" class="small fw-semibold">View all routes &rarr;</a>
         </div>
 
         <div class="table-responsive-wrapper">
@@ -95,7 +94,7 @@
             <thead>
               <tr>
                 <th scope="col">Route</th>
-                <th scope="col">Towards</th>
+                <th scope="col">Origin - Destination</th>
                 <th scope="col" style="min-width: 170px;">Avg delay</th>
                 <th scope="col" class="text-end">Readings</th>
               </tr>
@@ -104,8 +103,8 @@
               {% for route in top_delayed_routes %}
               <tr>
                 <td>
-                  <!-- TODO: link to the route detail page with {% url 'route_detail' route.route__route_id %} -->
-                  <a href="#" class="route-badge text-dark" aria-label="Route {{ route.route__short_name }} details">
+                 
+                  <a href="{% url 'route_detail' route.route__route_id %}" class="route-badge text-dark" aria-label="Route {{ route.route__short_name }} details">
                     <img src="{% static 'icons/bus.svg' %}" alt="" class="badge-icon" aria-hidden="true" />
                     <span>{{ route.route__short_name }}</span>
                   </a>

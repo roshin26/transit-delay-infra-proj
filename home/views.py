@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.db.models import Avg, Count
 from django.utils import timezone
 from datetime import timedelta
-
+from status.metrics import seconds_since_last_success
 from routes.models import Route, DelayReading, FetchLog
 
 
@@ -41,6 +41,16 @@ def index(request):
     total_count = recent.count()
     on_time_count = recent.filter(delay_seconds__lte=120).count()
     overall_avg = recent.aggregate(avg=Avg('delay_seconds'))['avg']
+    latest_fetch = FetchLog.objects.first()
+
+    if latest_fetch is None:
+       feed_status = 'none'
+    elif not latest_fetch.success:
+       feed_status = 'failed'
+    elif seconds_since_last_success() > 120:
+       feed_status = 'stale'
+    else:
+       feed_status = 'healthy'
 
     context = {
         'on_time_pct': round(on_time_count / total_count * 100, 1) if total_count else 0,
@@ -49,6 +59,7 @@ def index(request):
         'routes_tracked': Route.objects.count(),
         'most_delayed': top[0] if top else None,
         'top_delayed_routes': top,
-        'latest_fetch': FetchLog.objects.first(),
+        'latest_fetch': latest_fetch,
+        'feed_status': feed_status,
     }
     return render(request, 'home/index.html', context)

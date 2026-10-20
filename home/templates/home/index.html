@@ -150,16 +150,19 @@
         <div class="tracker-card">
           <div class="d-flex align-items-center justify-content-between mb-3">
             <h2 class="h5 mb-0">System status</h2>
-            {% if latest_fetch and latest_fetch.success %}
-              <span class="status-pill-badge normal">
-                <span class="feed-pulse-dot" style="width: 6px; height: 6px;" aria-hidden="true"></span>
+            {% if feed_status == 'healthy' %}
+            <span class="status-pill-badge normal">
+             <span class="feed-pulse-dot" style="width: 6px; height: 6px;" aria-hidden="true"></span>
                 Feed healthy
               </span>
-            {% elif latest_fetch %}
-              <span class="status-pill-badge incident">Last fetch failed</span>
+            {% elif feed_status == 'stale' %}
+            <span class="status-pill-badge incident">Data is stale</span>
+            {% elif feed_status == 'failed' %}
+            <span class="status-pill-badge incident">Last fetch failed</span>
             {% else %}
-              <span class="status-pill-badge incident">No fetches yet</span>
+            <span class="status-pill-badge incident">No fetches yet</span>
             {% endif %}
+
           </div>
 
           <div class="system-status-list">
